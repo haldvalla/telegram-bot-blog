@@ -1,0 +1,156 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Sellers - Unblur.me</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.png" alt="Unblur.me Logo" class="logo-img">
+                <span>Unblur.me</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="sellers.html" class="active">For Sellers</a></li>
+                    <li><a href="buyers.html">For Buyers</a></li>
+                    <li><a href="whitepaper.html">White Paper</a></li>
+                    <li><a href="terms.html">Terms</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sellers Features Section -->
+    <section class="features">
+        <div class="container">
+            <h1>For Sellers</h1>
+            <p>Unlock the power of Unblur.me to monetize your digital content securely and efficiently through Telegram.</p>
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <img src="upload-icon.png" alt="Content Upload Icon" class="feature-icon" data-src="upload-icon.png">
+                    <h3>Content Upload</h3>
+                    <p>Upload images or videos via Telegram, set a price, and choose public or private access.</p>
+                </div>
+                <div class="feature-card">
+                    <img src="payment-icon.png" alt="Secure Payments Icon" class="feature-icon" data-src="payment-icon.png">
+                    <h3>Secure Payments</h3>
+                    <p>Integrated PayPal.me for instant payments; platform handles verification and delivery.</p>
+                </div>
+                <div class="feature-card">
+                    <img src="earnings-icon.png" alt="Earnings Management Icon" class="feature-icon" data-src="earnings-icon.png">
+                    <h3>Earnings Management</h3>
+                    <p>Track balance and pay platform fees (20% per sale) via Telegram commands.</p>
+                </div>
+                <div class="feature-card">
+                    <img src="sharing-icon.png" alt="Easy Sharing Icon" class="feature-icon" data-src="sharing-icon.png">
+                    <h3>Easy Sharing</h3>
+                    <p>Generate shareable Telegram links for your content (e.g., t.me/UnblurMeBot?start=view_[fileId]).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sellers How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <ol class="steps">
+                <li>Register via Telegram using the /register command or through our API.</li>
+                <li>Set up your PayPal.me link and enable IPN in PayPal settings (<a href="paypal-guide.pdf">see guide</a>).</li>
+                <li>Upload content with the /upload command, set a price, and choose privacy settings.</li>
+                <li>Share the generated Telegram link with your audience.</li>
+                <li>Track earnings and pay platform fees using the /payfee command.</li>
+            </ol>
+            <img src="sellers-flowchart.png" alt="Sellers Flowchart" class="flowchart" data-src="sellers-flowchart.png">
+            <a href="https://t.me/UnblurMeBot/register" class="btn primary">Join as a Seller</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="logo.png" alt="Unblur.me Logo" class="footer-logo" data-src="logo.png">
+                    <p>Monetize with Ease</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="sellers.html">For Sellers</a></li>
+                        <li><a href="buyers.html">For Buyers</a></li>
+                        <li><a href="whitepaper.html">White Paper</a></li>
+                        <li><a href="terms.html">Terms</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-socials">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://t.me/UnblurMeBot">Telegram</a></li>
+                        <li><a href="https://x.com/UnblurMe">X</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Unblur.me. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

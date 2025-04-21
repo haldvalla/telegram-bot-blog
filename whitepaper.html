@@ -1,0 +1,138 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Paper - Unblur.me</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.png" alt="Unblur.me Logo" class="logo-img">
+                <span>Unblur.me</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="sellers.html">For Sellers</a></li>
+                    <li><a href="buyers.html">For Buyers</a></li>
+                    <li><a href="whitepaper.html" class="active">White Paper</a></li>
+                    <li><a href="terms.html">Terms</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- White Paper Section -->
+    <section>
+        <div class="container">
+            <h1>White Paper</h1>
+            <p>Explore the technical and strategic overview of Unblur.me, designed to democratize content monetization through Telegram’s accessibility and PayPal’s reliability.</p>
+            <h2>Introduction</h2>
+            <p><strong>Mission:</strong> To empower creators with a direct, secure, and private platform for monetizing digital content.</p>
+            <p><strong>Problem:</strong> Traditional platforms impose high fees and lack privacy. Unblur.me leverages Telegram as a direct, secure channel for creators and buyers.</p>
+            <h2>Technical Architecture</h2>
+            <ul>
+                <li><strong>Backend:</strong> Node.js with Express, Firebase Firestore for data storage, Cloudinary for file hosting.</li>
+                <li><strong>Authentication:</strong> JWT for API routes, Telegram ID for bot access.</li>
+                <li><strong>Payments:</strong> PayPal IPN for verification, 80/20 revenue split (seller/platform).</li>
+                <li><strong>Content Delivery:</strong> Original and blurred files stored on Cloudinary, delivered via Telegram media groups.</li>
+                <li><strong>Security:</strong> Helmet for CSP, CORS for restricted origins, Firebase security rules.</li>
+            </ul>
+            <h2>Business Model</h2>
+            <p><strong>Revenue:</strong> 20% platform fee per sale, logged as owedFee in Firestore.</p>
+            <p><strong>Scalability:</strong> Telegram’s global reach and Cloudinary’s CDN ensure low latency.</p>
+            <h2>Future Roadmap</h2>
+            <ul>
+                <li>Additional payment methods (e.g., cryptocurrency).</li>
+                <li>Multi-platform support (e.g., web-based uploads).</li>
+                <li>Analytics dashboard for sellers to track sales.</li>
+            </ul>
+            <a href="whitepaper.pdf" class="btn primary" download>Download White Paper</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="logo.png" alt="Unblur.me Logo" class="footer-logo" data-src="logo.png">
+                    <p>Monetize with Ease</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="sellers.html">For Sellers</a></li>
+                        <li><a href="buyers.html">For Buyers</a></li>
+                        <li><a href="whitepaper.html">White Paper</a></li>
+                        <li><a href="terms.html">Terms</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-socials">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://t.me/UnblurMeBot">Telegram</a></li>
+                        <li><a href="https://x.com/UnblurMe">X</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Unblur.me. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

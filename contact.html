@@ -1,0 +1,135 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Unblur.me</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.png" alt="Unblur.me Logo" class="logo-img">
+                <span>Unblur.me</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="sellers.html">For Sellers</a></li>
+                    <li><a href="buyers.html">For Buyers</a></li>
+                    <li><a href="whitepaper.html">White Paper</a></li>
+                    <li><a href="terms.html">Terms</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                    <li><a href="contact.html" class="active">Contact</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contact Section -->
+    <section>
+        <div class="container">
+            <h1>Contact</h1>
+            <h2>Frequently Asked Questions</h2>
+            <ul>
+                <li><strong>How do I set up PayPal IPN?</strong> Follow our <a href="paypal-guide.pdf">PayPal guide</a> for step-by-step instructions.</li>
+                <li><strong>What happens if a payment fails?</strong> Retry the /view_[fileId] command or contact the seller directly.</li>
+                <li><strong>How are platform fees calculated?</strong> A 20% fee is applied to each sale, payable via the /payfee command.</li>
+            </ul>
+            <h2>Contact Us</h2>
+            <p><strong>Telegram:</strong> <a href="https://t.me/UnblurMeBot">Unblur.me Bot</a></p>
+            <p><strong>Email:</strong> <a href="mailto:support@unblur.me">support@unblur.me</a></p>
+            <h2>Send a Message</h2>
+            <form id="contact-form" class="contact-form">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+                <label for="message">Message</label>
+                <textarea id="message" required></textarea>
+                <button type="submit" class="btn primary">Send Message</button>
+            </form>
+            <h2>Community</h2>
+            <p>Join our <a href="https://t.me/UnblurMeCommunity">Telegram Community</a> or follow us on <a href="https://x.com/UnblurMe">X</a> for updates and discussions.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="logo.png" alt="Unblur.me Logo" class="footer-logo" data-src="logo.png">
+                    <p>Monetize with Ease</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="sellers.html">For Sellers</a></li>
+                        <li><a href="buyers.html">For Buyers</a></li>
+                        <li><a href="whitepaper.html">White Paper</a></li>
+                        <li><a href="terms.html">Terms</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-socials">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://t.me/UnblurMeBot">Telegram</a></li>
+                        <li><a href="https://x.com/UnblurMe">X</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Unblur.me. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
